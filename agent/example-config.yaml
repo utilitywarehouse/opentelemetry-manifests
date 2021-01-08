@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-agent-conf
+  labels:
+    app: otel-agent
+data:
+  otel-agent-config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    processors:
+      batch:
+      memory_limiter:
+        # Same as --mem-ballast-size-mib CLI argument
+        ballast_size_mib: 165
+        # 80% of maximum memory
+        limit_mib: 400
+        # 25% of limit
+        spike_limit_mib: 100
+        check_interval: 5s
+    extensions:
+      health_check: {}
+      zpages: {}
+    exporters:
+      otlp:
+        endpoint: "otel-collector.partner:55680"
+        insecure: true
+        sending_queue:
+          enabled: true
+          queue_size: 15000
+        retry_on_failure:
+          enabled: true
+          max_elapsed_time: 1800s
+    service:
+      extensions: [health_check, zpages]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlp]
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlp]
+        logs:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlp]

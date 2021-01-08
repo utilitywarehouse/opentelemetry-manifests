@@ -1,0 +1,87 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: &app otel-collector
+  namespace: partner
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app otel-collector
+  namespace: partner
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  replicas: 3
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  template:
+    metadata:
+      name: *app
+      labels:
+        app: *app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8888"
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: *app
+          image: otel/opentelemetry-collector-contrib:0.17.0
+          command:
+            - "/otelcontribcol"
+            - "--config=/conf/otel-collector-config.yaml"
+            # Memory Ballast size should be max 1/3 to 1/2 of memory.
+            # If changing this, make sure you update collector config ballast value
+            - "--mem-ballast-size-mib=683"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 400Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          ports:
+            - name: otlp
+              containerPort: 55680
+            - name: metrics
+              containerPort: 8888
+            - name: ext-zpages
+              containerPort: 55679
+          volumeMounts:
+            - name: otel-collector-config-vol
+              mountPath: /conf
+      volumes:
+        - name: otel-collector-config-vol
+          configMap:
+            name: otel-collector-conf
+            items:
+              - key: otel-collector-config
+                path: otel-collector-config.yaml
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - *app

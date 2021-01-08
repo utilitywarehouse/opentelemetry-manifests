@@ -1,0 +1,82 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: &app otel-agent
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app otel-agent
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  replicas: 3
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  template:
+    metadata:
+      name: *app
+      labels:
+        app: *app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8888"
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: *app
+          image: otel/opentelemetry-collector-contrib:0.17.0
+          command:
+            - "/otelcontribcol"
+            - "--config=/conf/otel-agent.yaml"
+            # Memory Ballast size should be max 1/3 to 1/2 of memory.
+            # If changing this, make sure you update agent config ballast value
+            - "--mem-ballast-size-mib=165"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 500Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          ports:
+            - name: otlp
+              containerPort: 55680
+            - name: metrics
+              containerPort: 8888
+            - name: ext-zpages
+              containerPort: 55679
+          volumeMounts:
+            - name: otel-agent-config-vol
+              mountPath: /conf
+      volumes:
+        - name: otel-agent-config-vol
+          configMap:
+            name: otel-agent
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - *app

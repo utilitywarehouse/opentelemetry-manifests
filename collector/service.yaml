@@ -10,5 +10,8 @@ spec:
     - name: otlp
       port: 55680
       protocol: TCP
+    - name: otlp-legacy
+      port: 55680
+      protocol: TCP
   selector:
     app: *app

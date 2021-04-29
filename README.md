@@ -1,1 +1,1 @@
-# opentelementy collector manifests
+# opentelemetry collector manifests

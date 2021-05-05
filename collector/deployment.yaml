@@ -34,7 +34,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: *app
-          image: otel/opentelemetry-collector-contrib:0.25.0
+          image: otel/opentelemetry-collector-contrib:0.26.0
           command:
             - "/otelcontribcol"
             - "--config=/conf/otel-collector-config.yaml"
@@ -43,11 +43,11 @@ spec:
             - "--mem-ballast-size-mib=683"
           resources:
             requests:
-              cpu: 200m
-              memory: 400Mi
+              cpu: 500m
+              memory: 2Gi
             limits:
               cpu: 1
-              memory: 2Gi
+              memory: 3Gi
           readinessProbe:
             httpGet:
               path: /
@@ -61,10 +61,12 @@ spec:
               containerPort: 4317
             - name: otlp-legacy
               containerPort: 55680
-            - name: metrics
-              containerPort: 8888
             - name: ext-zpages
               containerPort: 55679
+            - name: collector-prom
+              containerPort: 8888
+            - name: prom
+              containerPort: 8889
           volumeMounts:
             - name: otel-collector-config-vol
               mountPath: /conf

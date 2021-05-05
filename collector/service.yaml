@@ -2,16 +2,41 @@ apiVersion: v1
 kind: Service
 metadata:
   name: &app otel-collector
-  namespace: partner
   labels:
     app: *app
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8888"
+    prometheus.io/path: /metrics
 spec:
   ports:
-    - name: otlp
+    - name: otlp-ingress
       port: 4317
       protocol: TCP
-    - name: otlp-legacy
+    - name: otlp-legacy-ingress
       port: 55680
+      protocol: TCP
+    - name: collector-prom
+      port: 8888
       protocol: TCP
   selector:
     app: *app
+---
+# 2nd service defined as we have multiple containers we want to scrape metrics from
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app otel-collector-metrics
+  labels:
+    app: otel-collector
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8889"
+    prometheus.io/path: /metrics
+spec:
+  ports:
+    - name: prom
+      port: 8889
+      protocol: TCP
+  selector:
+    app: otel-collector

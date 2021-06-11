@@ -2,7 +2,6 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: &app otel-collector
-  namespace: partner
 spec:
   selector:
     matchLabels:
@@ -13,7 +12,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: &app otel-collector
-  namespace: partner
 spec:
   selector:
     matchLabels:
@@ -73,10 +71,7 @@ spec:
       volumes:
         - name: otel-collector-config-vol
           configMap:
-            name: otel-collector-conf
-            items:
-              - key: otel-collector-config
-                path: otel-collector-config.yaml
+            name: otel-collector
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

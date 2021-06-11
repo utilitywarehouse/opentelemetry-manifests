@@ -34,7 +34,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: *app
-          image: otel/opentelemetry-collector-contrib:0.27.0
+          image: otel/opentelemetry-collector-contrib:0.28.0
           command:
             - "/otelcontribcol"
             - "--config=/conf/otel-collector-config.yaml"

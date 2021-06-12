@@ -24,7 +24,7 @@ data:
       zpages: {}
     exporters:
       otlp:
-        endpoint: "otel-collector.partner:4317"
+        endpoint: "otel-agent-gateway.partner:4317"
         insecure: true
         sending_queue:
           enabled: true

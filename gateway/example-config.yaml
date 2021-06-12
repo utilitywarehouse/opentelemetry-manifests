@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: otel-collector-conf
+  name: otel-agent-gateway-conf
   labels:
-    app: otel-collector
+    app: otel-agent-gateway
 data:
-  otel-collector-config: |
+  otel-agent-gateway-config: |
     receivers:
       otlp:
         protocols:

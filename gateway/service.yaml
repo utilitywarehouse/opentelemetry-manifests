@@ -21,22 +21,3 @@ spec:
       protocol: TCP
   selector:
     app: *app
----
-# 2nd service defined as we have multiple containers we want to scrape metrics from
-apiVersion: v1
-kind: Service
-metadata:
-  name: &app otel-agent-gateway-metrics
-  labels:
-    app: otel-agent-gateway
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "8889"
-    prometheus.io/path: /metrics
-spec:
-  ports:
-    - name: prom
-      port: 8889
-      protocol: TCP
-  selector:
-    app: otel-agent-gateway

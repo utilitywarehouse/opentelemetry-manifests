@@ -13,9 +13,6 @@ spec:
     - name: otlp-ingress
       port: 4317
       protocol: TCP
-    - name: otlp-legacy-ingress
-      port: 55680
-      protocol: TCP
     - name: collector-prom
       port: 8888
       protocol: TCP

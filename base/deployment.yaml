@@ -1,7 +1,7 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: &app otel-agent
+  name: &app otel-collector
 spec:
   selector:
     matchLabels:
@@ -11,7 +11,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: &app otel-agent
+  name: &app otel-collector
 spec:
   selector:
     matchLabels:
@@ -32,17 +32,17 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: *app
-          image: otel/opentelemetry-collector-contrib:0.39.0
+          image: otel/opentelemetry-collector-contrib:0.41.0
           command:
             - "/otelcontribcol"
-            - "--config=/conf/otel-agent.yaml"
+            - "--config=/conf/otel-collector.yaml"
           resources:
             requests:
-              cpu: 100m
-              memory: 200Mi
-            limits:
               cpu: 500m
-              memory: 500Mi
+              memory: 2Gi
+            limits:
+              cpu: 1
+              memory: 3Gi
           readinessProbe:
             httpGet:
               path: /
@@ -54,17 +54,19 @@ spec:
           ports:
             - name: otlp
               containerPort: 4317
-            - name: metrics
-              containerPort: 8888
             - name: ext-zpages
               containerPort: 55679
+            - name: collector-prom
+              containerPort: 8888
+            - name: prom
+              containerPort: 8889
           volumeMounts:
-            - name: otel-agent-config-vol
+            - name: otel-collector-config-vol
               mountPath: /conf
       volumes:
-        - name: otel-agent-config-vol
+        - name: otel-collector-config-vol
           configMap:
-            name: otel-agent
+            name: otel-collector
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

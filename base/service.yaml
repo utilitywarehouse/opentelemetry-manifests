@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: &app otel-agent-gateway
+  name: &app otel-collector
   labels:
     app: *app
   annotations:
@@ -23,9 +23,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: &app otel-agent-gateway-metrics
+  name: &app otel-collector-metrics
   labels:
-    app: otel-agent-gateway
+    app: otel-collector
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8889"
@@ -36,4 +36,4 @@ spec:
       port: 8889
       protocol: TCP
   selector:
-    app: otel-agent-gateway
+    app: otel-collector

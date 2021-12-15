@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: otel-agent-conf
+  name: otel-collector-conf
   labels:
-    app: otel-agent
+    app: otel-collector
 data:
-  otel-agent-config: |
+  otel-collector-config: |
     receivers:
       otlp:
         protocols:
@@ -23,27 +23,23 @@ data:
       health_check: {}
       zpages: {}
     exporters:
-      otlp:
-        endpoint: "otel-agent-gateway.partner:4317"
+      jaeger:
+        endpoint: "jaeger-collector.otel:14250"
         insecure: true
-        sending_queue:
+      logging:
+        loglevel: debug
+      prometheus:
+        endpoint: "0.0.0.0:8889"
+        resource_to_telemetry_conversion:
           enabled: true
-          queue_size: 15000
-        retry_on_failure:
-          enabled: true
-          max_elapsed_time: 1800s
     service:
       extensions: [health_check, zpages]
       pipelines:
-        traces:
+        traces/jaeger:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [otlp]
-        metrics:
+          exporters: [logging]
+        metrics/prometheus:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [otlp]
-        logs:
-          receivers: [otlp]
-          processors: [memory_limiter, batch]
-          exporters: [otlp]
+          exporters: [prometheus]

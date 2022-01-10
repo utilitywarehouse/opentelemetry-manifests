@@ -33,8 +33,7 @@ spec:
       containers:
         - name: *app
           image: otel/opentelemetry-collector-contrib:0.42.0
-          command:
-            - "/otelcontribcol"
+          args:
             - "--config=/conf/otel-collector.yaml"
           resources:
             requests:

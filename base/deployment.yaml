@@ -2,6 +2,11 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: &app otel-collector
+  annotations:
+    "app.uw.systems/description": "OpenTelemetry collector"
+    "app.uw.systems/tier": "tier_3"
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/opentelemetry-manifests"
 spec:
   selector:
     matchLabels:

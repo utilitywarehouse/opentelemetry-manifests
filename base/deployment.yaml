@@ -67,10 +67,15 @@ spec:
           volumeMounts:
             - name: otel-collector-config-vol
               mountPath: /conf
+            - name: otel-collector-kafka-client-certificate
+              mountPath: /kafka-client-certificate
       volumes:
         - name: otel-collector-config-vol
           configMap:
             name: otel-collector
+        - name: otel-collector-kafka-client-certificate
+          secret:
+            secretName: otel-collector-kafka-client-certificate
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

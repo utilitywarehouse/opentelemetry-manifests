@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: otel-collector-kafka-client
+spec:
+  commonName: otel/collector
+  dnsNames:
+    - otel-collector.otel
+  issuerRef:
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
+  secretName: otel-collector-kafka-client-certificate

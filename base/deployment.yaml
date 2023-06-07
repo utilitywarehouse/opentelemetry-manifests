@@ -69,6 +69,7 @@ spec:
               mountPath: /conf
             - name: otel-collector-kafka-client-certificate
               mountPath: /kafka-client-certificate
+              readOnly: true
       volumes:
         - name: otel-collector-config-vol
           configMap:

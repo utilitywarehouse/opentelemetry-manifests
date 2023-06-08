@@ -6,6 +6,8 @@ spec:
   commonName: otel/collector
   dnsNames:
     - otel-collector.otel
+  duration: 24h
+  renewBefore: 2h
   issuerRef:
     kind: ClusterIssuer
     name: kafka-shared-selfsigned-issuer

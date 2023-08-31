@@ -5,6 +5,10 @@
 Namespace that runs [OpenTelemetry](https://opentelemetry.io/) Collector to
 inject, process & export traces for teams at UW.
 
+Repository also contains manifest for [Tempo](https://grafana.com/docs/tempo/latest/) backend,
+allowing querying and browsing traces in Grafana UI.
+
+
 ![Design](./otel.svg)
 
 ## Upgrade

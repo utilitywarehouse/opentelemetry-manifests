@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &app tempo-metrics-generator
+spec:
+  podManagementPolicy: Parallel
+  replicas: 3
+  selector:
+    matchLabels:
+      app: *app
+      tempo-gossip-member: "true"
+  serviceName: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+        tempo-gossip-member: "true"
+      annotations:
+        injector.tumblr.com/request: vault-sidecar-aws
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3200"
+        prometheus.io/path: /metrics
+    spec:
+      serviceAccountName: tempo
+      terminationGracePeriodSeconds: 90
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: *app
+            topologyKey: kubernetes.io/hostname
+      containers:
+        - name: generator
+          image: tempo
+          args:
+            - -target=metrics-generator
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+            - -config.expand-env=true
+          envFrom:
+            - configMapRef:
+                name: tempo-config-overlay
+          resources:
+            requests:
+              cpu: 0
+              memory: 500Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3200
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          ports:
+            - name: prom-metrics
+              containerPort: 3200
+          volumeMounts:
+            - name: tempo-config-vol
+              mountPath: /conf
+            - name: datadir
+              mountPath: /var/tempo
+      volumes:
+        - name: tempo-config-vol
+          configMap:
+            name: tempo
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+    - metadata:
+        name: datadir
+        labels:
+          app: *app
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi

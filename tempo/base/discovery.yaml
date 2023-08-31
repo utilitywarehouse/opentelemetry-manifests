@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo-gossip-ring
+spec:
+  clusterIP: None
+  ports:
+    - name: gossip-ring
+      port: 7946
+      protocol: TCP
+      targetPort: 7946
+  selector:
+    tempo-gossip-member: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo-query-frontend-discovery
+spec:
+  clusterIP: None
+  ports:
+    - name: grpc
+      port: 9095
+      targetPort: 9095
+  publishNotReadyAddresses: true
+  selector:
+    app: tempo-query-frontend

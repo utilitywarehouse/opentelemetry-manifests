@@ -1,0 +1,65 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: &app tempo-memcached
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: *app
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &app tempo-memcached
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: *app
+  serviceName: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9150"
+        prometheus.io/path: /metrics
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: *app
+            topologyKey: kubernetes.io/hostname
+      containers:
+        - name: memcached
+          image: memcached:1.6.14-alpine
+          args:
+            - -m 512
+            - -I 5m
+            - -c 4096
+            - -v
+          resources:
+            requests:
+              cpu: 0
+              memory: 0
+            limits:
+              cpu: 1
+              memory: 1Gi
+          ports:
+            - name: client
+              containerPort: 11211
+        - name: exporter
+          image: prom/memcached-exporter:v0.9.0
+          args:
+            - --memcached.address=localhost:11211
+            - --web.listen-address=0.0.0.0:9150
+          ports:
+            - name: http-metrics
+              containerPort: 9150
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates: []

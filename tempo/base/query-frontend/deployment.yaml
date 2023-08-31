@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app tempo-query-frontend
+  labels:
+    app: *app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      name: *app
+      labels:
+        app: *app
+      annotations:
+        injector.tumblr.com/request: vault-sidecar-aws
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3200"
+        prometheus.io/path: /metrics
+    spec:
+      serviceAccountName: tempo
+      containers:
+        - name: query-frontend
+          image: tempo
+          args:
+            - -target=query-frontend
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+            - -config.expand-env=true
+          envFrom:
+            - configMapRef:
+                name: tempo-config-overlay
+          resources:
+            requests:
+              cpu: 0m
+              memory: 500Mi
+            limits:
+              cpu: 1m
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3200
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          ports:
+            - name: prom-metrics
+              containerPort: 3200
+          volumeMounts:
+            - name: tempo-config-vol
+              mountPath: /conf
+      volumes:
+        - name: tempo-config-vol
+          configMap:
+            name: tempo

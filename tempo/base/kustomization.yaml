@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+  - name: tempo
+    files:
+      - tempo.yaml=config.yaml
+
+resources:
+  - auth.yaml
+  - discovery.yaml
+
+  - compactor
+  - distributor
+  - ingester
+  - memcached
+  - metrics-generator
+  - querier
+  - query-frontend
+
+images:
+  - name: tempo
+    newName: grafana/tempo
+    newTag: 2.2.0

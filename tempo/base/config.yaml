@@ -1,0 +1,129 @@
+# use curl http://localhost:3200/status/config after connecting to any of components to get current config
+http_api_prefix: ""
+server:
+  http_listen_port: 3200
+  # 20 mb- above max_bytes_per_trace, as querying the trace data from frontend
+  # can return values bigger than that.
+  grpc_server_max_recv_msg_size: 20_000_000
+  grpc_server_max_send_msg_size: 20_000_000
+
+memberlist:
+  abort_if_cluster_join_fails: false
+  bind_port: 7946
+  join_members:
+    - tempo-gossip-ring:7946
+
+metrics_generator:
+  storage:
+    path: /var/tempo/wal
+    remote_write:
+      - url: http://prometheus-0.prometheus-push:9090/api/v1/write
+        send_exemplars: true
+      - url: http://prometheus-1.prometheus-push:9090/api/v1/write
+        send_exemplars: true
+  processor:
+    service_graphs:
+      wait: 30s
+      max_items: 50_000
+      workers: 20
+      enable_client_server_prefix: true
+      dimensions:
+        - k8s.namespace.name
+        - uw.team
+    span_metrics:
+      dimensions:
+        - k8s.namespace.name
+        - uw.team
+
+query_frontend:
+  max_batch_size: 8
+  search:
+    default_result_limit: 20
+    max_result_limit: 500
+    concurrent_jobs: 10_000
+    max_duration: 0
+
+querier:
+  max_concurrent_queries: 500
+  trace_by_id:
+    query_timeout: 30s
+
+  frontend_worker:
+    frontend_address: tempo-query-frontend-discovery:9095
+    grpc_client_config:
+      max_recv_msg_size: 20_000_000
+      max_send_msg_size: 20_000_000
+
+distributor:
+  receivers:
+    kafka:
+      protocol_version: 2.6.0
+      brokers:
+        - kafka-shared-0.kafka-shared-headless.pubsub.svc.cluster.merit:9092
+        - kafka-shared-1.kafka-shared-headless.pubsub.svc.cluster.merit:9092
+        - kafka-shared-2.kafka-shared-headless.pubsub.svc.cluster.merit:9092
+      group_id: processor-tempo
+      client_id: processor-tempo
+      auth:
+        tls:
+          ca_file: /kafka-client-certificate/ca.crt
+          cert_file: /kafka-client-certificate/tls.crt
+          key_file: /kafka-client-certificate/tls.key
+          reload_interval: 1h
+
+ingester:
+  max_block_duration: 15m
+  lifecycler:
+    ring:
+      replication_factor: 3
+
+storage:
+  trace:
+    wal:
+      path: /var/tempo/wal
+
+    pool:
+      max_workers: 1000
+      queue_depth: 20_000
+
+    backend: s3
+    s3:
+      bucket: ${S3_BUCKET}
+      endpoint: s3.eu-west-1.amazonaws.com
+      hedge_requests_at: 500ms
+
+    cache: memcached
+    memcached:
+      consistent_hash: true
+      host: tempo-memcached
+      service: memcached-client
+      timeout: 1000ms
+
+    search:
+      cache_control:
+        footer: true
+
+compactor:
+  compaction:
+    # 30 days
+    block_retention: 720h
+    # 500MB max block bytes
+    max_block_bytes: 500_000_000
+    compaction_window: 1h
+    compaction_cycle: 30s
+  ring:
+    kvstore:
+      store: memberlist
+
+overrides:
+  # 5 mb
+  # Spans added to blocks over that limit will be dropped
+  # thus, it doesn't really guarantee there will be no bigger traces,
+  # but it limits them enough to allow querying any trace.
+  max_bytes_per_trace: 5_000_000
+  max_traces_per_user: 0
+  metrics_generator_forwarder_queue_size: 500
+  metrics_generator_forwarder_workers: 5
+  metrics_generator_processors:
+    - service-graphs
+    - span-metrics

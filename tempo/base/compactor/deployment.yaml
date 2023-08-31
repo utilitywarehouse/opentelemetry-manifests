@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app tempo-compactor
+  labels:
+    app: *app
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      name: *app
+      labels:
+        app: *app
+      annotations:
+        injector.tumblr.com/request: vault-sidecar-aws
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3200"
+        prometheus.io/path: /metrics
+    spec:
+      serviceAccountName: tempo
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: compactor
+          image: tempo
+          args:
+            - -target=compactor
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+            - -config.expand-env=true
+          env:
+            - name: GOMEMLIMIT
+              value: "4000MiB"
+          envFrom:
+            - configMapRef:
+                name: tempo-config-overlay
+          resources:
+            requests:
+              cpu: 0
+              memory: 1Gi
+            limits:
+              cpu: 2
+              memory: 4.5Gi
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3200
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          ports:
+            - name: prom-metrics
+              containerPort: 3200
+          volumeMounts:
+            - name: tempo-config-vol
+              mountPath: /conf
+      volumes:
+        - name: tempo-config-vol
+          configMap:
+            name: tempo

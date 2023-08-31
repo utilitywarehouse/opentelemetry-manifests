@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app tempo-query-frontend
+spec:
+  ports:
+    - name: *app
+      port: 3200
+      protocol: TCP
+  selector:
+    app: *app

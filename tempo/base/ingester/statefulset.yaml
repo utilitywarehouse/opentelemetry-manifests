@@ -1,0 +1,91 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: &app tempo-ingester
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: *app
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &app tempo-ingester
+spec:
+  podManagementPolicy: Parallel
+  replicas: 10
+  selector:
+    matchLabels:
+      app: *app
+      tempo-gossip-member: "true"
+  serviceName: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+        tempo-gossip-member: "true"
+      annotations:
+        injector.tumblr.com/request: vault-sidecar-aws
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3200"
+        prometheus.io/path: /metrics
+    spec:
+      serviceAccountName: tempo
+      terminationGracePeriodSeconds: 60
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: *app
+            topologyKey: kubernetes.io/hostname
+      containers:
+        - name: ingester
+          image: tempo
+          args:
+            - -target=ingester
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+            - -config.expand-env=true
+          envFrom:
+            - configMapRef:
+                name: tempo-config-overlay
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: 2
+              memory: 6Gi
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3200
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          ports:
+            - name: prom-metrics
+              containerPort: 3200
+          volumeMounts:
+            - name: tempo-config-vol
+              mountPath: /conf
+            - name: datadir
+              mountPath: /var/tempo
+      volumes:
+        - name: tempo-config-vol
+          configMap:
+            name: tempo
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+    - metadata:
+        name: datadir
+        labels:
+          app: *app
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Gi

@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tempo-distributor-kafka-client
+spec:
+  commonName: otel/tempo-distributor
+  dnsNames:
+    - tempo-distributor.otel
+  duration: 24h
+  renewBefore: 3h
+  issuerRef:
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
+  secretName: tempo-distributor-kafka-client-certificate

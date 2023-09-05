@@ -28,7 +28,11 @@ metrics_generator:
       workers: 20
       enable_client_server_prefix: true
       dimensions:
+        - k8s.cluster.name
         - k8s.namespace.name
+        - net.host.name
+        - service.name
+        - service.namespace
         - uw.team
     span_metrics:
       dimensions:

@@ -9,5 +9,6 @@ resources:
 # Currently, there is no way to template configmap contents using Kustomize.
 configMapGenerator:
   - name: tempo-config-overlay
+    behavior: replace
     literals:
       - S3_BUCKET=example-s3-bucket

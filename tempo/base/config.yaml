@@ -31,7 +31,6 @@ metrics_generator:
         - k8s.cluster.name
         - k8s.namespace.name
         - net.host.name
-        - service.name
         - service.namespace
         - uw.team
     span_metrics:

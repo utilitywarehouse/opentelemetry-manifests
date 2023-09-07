@@ -119,6 +119,7 @@ compactor:
     kvstore:
       store: memberlist
 
+# todo: change overrides syntax https://github.com/grafana/tempo/blob/a2b5c608022ba1467e317960e0b5bed1e9ff5ec4/CHANGELOG.md?plain=1#L32-L55
 overrides:
   # 5 mb
   # Spans added to blocks over that limit will be dropped
@@ -127,6 +128,7 @@ overrides:
   max_bytes_per_trace: 5_000_000
   max_traces_per_user: 0
   metrics_generator_forwarder_queue_size: 500
+  metrics_generator_processor_service_graphs_enable_client_server_prefix: true
   metrics_generator_forwarder_workers: 5
   metrics_generator_processors:
     - service-graphs

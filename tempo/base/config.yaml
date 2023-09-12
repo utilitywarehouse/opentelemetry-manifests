@@ -49,7 +49,7 @@ query_frontend:
 querier:
   max_concurrent_queries: 500
   trace_by_id:
-    query_timeout: 30s
+    query_timeout: 60s
 
   frontend_worker:
     frontend_address: tempo-query-frontend-discovery:9095

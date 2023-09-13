@@ -34,10 +34,10 @@ spec:
                 name: tempo-config-overlay
           resources:
             requests:
-              cpu: 100m
+              cpu: 50m
               memory: 500Mi
             limits:
-              cpu: "1"
+              cpu: "2"
               memory: 2Gi
           readinessProbe:
             httpGet:

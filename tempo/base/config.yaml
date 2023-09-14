@@ -5,7 +5,7 @@ server:
   # 20 mb- above max_bytes_per_trace, as querying the trace data from frontend
   # can return values bigger than that.
   grpc_server_max_recv_msg_size: 20_000_000
-  grpc_server_max_send_msg_size: 20_000_000
+  grpc_server_max_send_msg_size: 50_000_000
 
 memberlist:
   abort_if_cluster_join_fails: false
@@ -55,7 +55,7 @@ querier:
     frontend_address: tempo-query-frontend-discovery:9095
     grpc_client_config:
       max_recv_msg_size: 20_000_000
-      max_send_msg_size: 20_000_000
+      max_send_msg_size: 50_000_000
 
 distributor:
   receivers:

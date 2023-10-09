@@ -53,7 +53,7 @@ spec:
                 name: tempo-config-overlay
           resources:
             requests:
-              cpu: 20m
+              cpu: 0m
               memory: 2Gi
             limits:
               cpu: 2

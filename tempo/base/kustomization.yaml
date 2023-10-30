@@ -6,7 +6,7 @@ configMapGenerator:
     files:
       - tempo.yaml=config.yaml
   - name: tempo-config-overlay
-    # Env from this configmap are injected to Tempo deploys/ sts in order to be used in tempo.yaml.
+    # Env from this configmap are injected to Tempo deploys/sts in order to be used in tempo.yaml.
     # Currently, there is no way to template configmap contents using Kustomize.
     literals:
       - S3_BUCKET=example-s3-bucket
@@ -26,4 +26,4 @@ resources:
 images:
   - name: tempo
     newName: grafana/tempo
-    newTag: 2.2.4
+    newTag: 2.3.0

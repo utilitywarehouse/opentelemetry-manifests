@@ -86,6 +86,63 @@ storage:
     wal:
       path: /var/tempo/wal
 
+    block:
+      version: vParquet3
+      # https://grafana.com/docs/tempo/latest/operations/dedicated_columns/
+      #
+      # Dedicated attribute columns are limited to 10 span attributes and 10 resource attributes with string values.
+      # As a rule of thumb, good candidates for dedicated attribute columns are attributes that contribute the most 
+      # to the block size, even if they are not frequently queried. Reducing the generic attribute key-value list 
+      # size significantly improves query performance.
+      parquet_dedicated_columns:
+        # resource
+        - name: deployment.environment
+          type: string
+          scope: resource
+        - name: host.name
+          type: string
+          scope: resource
+        - name: net.host.name
+          type: string
+          scope: resource
+        - name: service.version
+          type: string
+          scope: resource
+        - name: service.namespace
+          type: string
+          scope: resource
+        - name: uw.team
+          type: string
+          scope: resource
+        # span
+        - name: cerbos.policy.name
+          type: string
+          scope: span
+        - name: db.statement
+          type: string
+          scope: span
+        - name: db.system
+          type: string
+          scope: span
+        - name: issuer
+          type: string
+          scope: span
+        - name: messaging.source.name
+          type: string
+          scope: span
+        - name: messaging.operation
+          type: string
+          scope: span
+        - name: net.peer.name
+          type: string
+          scope: span
+        - name: rpc.service
+          type: string
+          scope: span
+        - name: rpc.method
+          type: string
+          scope: span
+
     pool:
       max_workers: 1000
       queue_depth: 20_000

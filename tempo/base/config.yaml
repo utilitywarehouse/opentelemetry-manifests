@@ -72,7 +72,9 @@ distributor:
           reload_interval: 1h
 
 ingester:
-  max_block_duration: 15m
+  max_block_duration: 5m
+  # 100 MB for a block in ingester
+  max_block_bytes: 100_000_000
   lifecycler:
     ring:
       replication_factor: 3

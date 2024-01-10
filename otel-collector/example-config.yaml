@@ -18,8 +18,6 @@ data:
         limit_percentage: 80
         spike_limit_percentage: 25
     extensions:
-      memory_ballast:
-        size_mib: 80
       health_check: {}
       zpages: {}
     exporters:

@@ -48,6 +48,7 @@ spec:
             - -config.file=/conf/tempo.yaml
             - -mem-ballast-size-mbs=1024
             - -config.expand-env=true
+            - -shutdown-delay=15s
           envFrom:
             - configMapRef:
                 name: tempo-config-overlay

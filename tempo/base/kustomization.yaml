@@ -26,4 +26,4 @@ resources:
 images:
   - name: tempo
     newName: grafana/tempo
-    newTag: 2.3.0
+    newTag: v2.4.0-rc.0

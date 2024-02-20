@@ -155,16 +155,22 @@ storage:
       endpoint: s3.eu-west-1.amazonaws.com
       hedge_requests_at: 500ms
 
-    cache: memcached
+cache:
+  background:
+    writeback_goroutines: 5
+  caches:
+  - roles:
+    - bloom
+    - frontend-search
+    - parquet-footer
+    - parquet-column-idx
+    - parquet-offset-idx
+    - parquet-page
     memcached:
       consistent_hash: true
       host: tempo-memcached
       service: memcached-client
       timeout: 1000ms
-
-    search:
-      cache_control:
-        footer: true
 
 compactor:
   compaction:

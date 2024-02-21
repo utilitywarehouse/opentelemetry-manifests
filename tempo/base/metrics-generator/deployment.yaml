@@ -2,6 +2,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: &app tempo-metrics-generator
+  annotations:
+    "app.uw.systems/description": "Tempo metrics-generator processes spans and write metrics to Prometheus"
+    "app.uw.systems/tier": "tier_3"
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/repos.tempo": "https://github.com/grafana/tempo"
 spec:
   podManagementPolicy: Parallel
   replicas: 3

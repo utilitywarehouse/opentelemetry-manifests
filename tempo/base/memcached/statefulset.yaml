@@ -12,6 +12,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: &app tempo-memcached
+  annotations:
+    "app.uw.systems/description": "Cache for various Tempo query indexes to improve repeat queries"
+    "app.uw.systems/tier": "tier_3"
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/repos.memcached": "https://github.com/memcached/memcached"
 spec:
   replicas: 3
   selector:

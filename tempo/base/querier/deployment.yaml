@@ -4,6 +4,12 @@ metadata:
   name: &app tempo-querier
   labels:
     app: *app
+  annotations:
+    "app.uw.systems/description": "Tempo queriers are responsible for querying the backends/cache for the traceID"
+    "app.uw.systems/tier": "tier_3"
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/opentelemetry-manifests"
+    "app.uw.systems/repos.tempo": "https://github.com/grafana/tempo"
 spec:
   replicas: 10
   selector:

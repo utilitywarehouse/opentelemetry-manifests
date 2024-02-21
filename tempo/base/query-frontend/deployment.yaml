@@ -8,6 +8,7 @@ metadata:
     "app.uw.systems/description": "Tempo query-frontend are responsible for sharding incoming requests for faster processing in parallel (by the queriers)"
     "app.uw.systems/tier": "tier_3"
     "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/opentelemetry-manifests"
     "app.uw.systems/repos.tempo": "https://github.com/grafana/tempo"
 spec:
   replicas: 2

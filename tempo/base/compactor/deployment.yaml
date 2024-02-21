@@ -8,6 +8,7 @@ metadata:
     "app.uw.systems/description": "Tempo compactor streams blocks from the storage backend, combine them and write them back"
     "app.uw.systems/tier": "tier_3"
     "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/opentelemetry-manifests"
     "app.uw.systems/repos.tempo": "https://github.com/grafana/tempo"
 spec:
   replicas: 5

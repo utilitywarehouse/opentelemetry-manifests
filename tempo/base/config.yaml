@@ -1,5 +1,6 @@
 # use curl http://localhost:3200/status/config after connecting to any of components to get current config
 http_api_prefix: ""
+stream_over_http_enabled: true
 server:
   http_listen_port: 3200
   # 20 mb- above max_bytes_per_trace, as querying the trace data from frontend

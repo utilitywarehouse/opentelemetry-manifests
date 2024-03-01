@@ -89,7 +89,6 @@ storage:
       path: /var/tempo/wal
 
     block:
-      version: vParquet3
       # https://grafana.com/docs/tempo/latest/operations/dedicated_columns/
       #
       # Dedicated attribute columns are limited to 10 span attributes and 10 resource attributes with string values.

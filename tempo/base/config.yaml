@@ -162,8 +162,6 @@ cache:
     - bloom
     - frontend-search
     - parquet-footer
-    - parquet-column-idx
-    - parquet-offset-idx
     - parquet-page
     memcached:
       consistent_hash: true

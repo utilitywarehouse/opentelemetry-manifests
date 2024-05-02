@@ -1,5 +1,6 @@
 # use curl http://localhost:3200/status/config after connecting to any of components to get current config
 http_api_prefix: ""
+stream_over_http_enabled: true
 server:
   http_listen_port: 3200
   # 20 mb- above max_bytes_per_trace, as querying the trace data from frontend
@@ -89,7 +90,6 @@ storage:
       path: /var/tempo/wal
 
     block:
-      version: vParquet3
       # https://grafana.com/docs/tempo/latest/operations/dedicated_columns/
       #
       # Dedicated attribute columns are limited to 10 span attributes and 10 resource attributes with string values.
@@ -163,8 +163,6 @@ cache:
     - bloom
     - frontend-search
     - parquet-footer
-    - parquet-column-idx
-    - parquet-offset-idx
     - parquet-page
     memcached:
       consistent_hash: true

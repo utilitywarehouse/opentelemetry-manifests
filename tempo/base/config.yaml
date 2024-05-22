@@ -63,9 +63,9 @@ distributor:
     kafka:
       protocol_version: 2.6.0
       brokers:
-        - kafka-shared-0.kafka-shared-headless.pubsub.svc.cluster.aws:9092
-        - kafka-shared-1.kafka-shared-headless.pubsub.svc.cluster.aws:9092
-        - kafka-shared-2.kafka-shared-headless.pubsub.svc.cluster.aws:9092
+        - kafka-bitnami-0.kafka-bitnami-headless.otel.svc.cluster.aws:9092
+        - kafka-bitnami-1.kafka-bitnami-headless.otel.svc.cluster.aws:9092
+        - kafka-bitnami-2.kafka-bitnami-headless.otel.svc.cluster.aws:9092
       group_id: processor-tempo
       topic: "otel.otlp_spans"
       client_id: processor-tempo

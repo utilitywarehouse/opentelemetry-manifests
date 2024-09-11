@@ -21,7 +21,6 @@ spec:
   selector:
     matchLabels:
       app: *app
-  replicas: 3
   minReadySeconds: 5
   progressDeadlineSeconds: 120
   template:

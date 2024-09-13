@@ -20,7 +20,6 @@ metadata:
     "app.uw.systems/repos.tempo": "https://github.com/grafana/tempo"
 spec:
   podManagementPolicy: Parallel
-  replicas: 10
   selector:
     matchLabels:
       app: *app
@@ -71,8 +70,8 @@ spec:
                 name: tempo-config-overlay
           resources:
             requests:
-              cpu: 0m
-              memory: 2Gi
+              cpu: "1500m"
+              memory: 3Gi
             limits:
               cpu: 2
               memory: 6Gi

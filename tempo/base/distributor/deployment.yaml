@@ -11,7 +11,6 @@ metadata:
     "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/opentelemetry-manifests"
     "app.uw.systems/repos.tempo": "https://github.com/grafana/tempo"
 spec:
-  replicas: 3
   selector:
     matchLabels:
       app: *app
@@ -44,10 +43,10 @@ spec:
                 name: tempo-config-overlay
           resources:
             requests:
-              cpu: 0
-              memory: 1Gi
+              cpu: "1500m"
+              memory: 2Gi
             limits:
-              cpu: 2
+              cpu: "2"
               memory: 4Gi
           readinessProbe:
             httpGet:

@@ -22,6 +22,8 @@ metrics_generator:
         send_exemplars: true
       - url: http://prometheus-1.prometheus-push:9090/api/v1/write
         send_exemplars: true
+  traces_storage:
+    path: /var/tempo/traces
   processor:
     local_blocks:
       filter_server_spans: false

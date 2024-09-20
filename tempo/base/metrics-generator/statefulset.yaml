@@ -53,8 +53,10 @@ spec:
           args:
             - -target=metrics-generator
             - -config.file=/conf/tempo.yaml
-            - -mem-ballast-size-mbs=1024
             - -config.expand-env=true
+          env:
+            - name: GOMEMLIMIT
+              value: "1500MiB"
           envFrom:
             - configMapRef:
                 name: tempo-config-overlay

@@ -23,6 +23,9 @@ metrics_generator:
       - url: http://prometheus-1.prometheus-push:9090/api/v1/write
         send_exemplars: true
   processor:
+    local_blocks:
+      filter_server_spans: false
+      flush_to_storage: true
     service_graphs:
       wait: 30s
       max_items: 50_000
@@ -194,11 +197,12 @@ overrides:
       max_traces_per_user: 0
     metrics_generator:
       processors:
+        - local-blocks
         - service-graphs
         - span-metrics
       forwarder:
-        queue_size: 10_000
-        workers: 20
+        queue_size: 50_000
+        workers: 50
       processor:
         service_graphs:
           enable_client_server_prefix: true

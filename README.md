@@ -9,7 +9,36 @@ Repository also contains manifest for [Tempo](https://grafana.com/docs/tempo/lat
 allowing querying and browsing traces in Grafana UI.
 
 
-![Design](./otel.svg)
+``` mermaid
+flowchart LR
+    Pod[
+        **pod**
+        Running our applications with OpenTelmetry instrumentation
+    ] -- "quickly offload traces" --> OTEL
+
+    subgraph OTEL[OpenTelemetry stack]
+    direction LR
+        Collector[
+            **collector**
+            additional handling like retries, batching
+        ]
+    end OTEL
+
+    OTEL -- "via Collector's Exporter" --> Kafka -- "via Tempo's Distributor" --> Grafana
+
+    subgraph Grafana[Grafana stack]
+    Tempo["
+        **tempo**
+        provides storage and querying of traces
+    "]
+    end Grafana
+```
+
+For the architecture of the 3rd party pieces see:
+
+  - [OpenTelemetry
+    Collector](https://opentelemetry.io/docs/collector/architecture/)
+  - [Tempo](https://grafana.com/docs/tempo/latest/operations/architecture/)
 
 ## Upgrade
 

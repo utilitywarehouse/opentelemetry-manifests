@@ -1,6 +1,8 @@
 # use curl http://localhost:3200/status/config after connecting to any of components to get current config
 http_api_prefix: ""
 stream_over_http_enabled: true
+
+# https://grafana.com/docs/tempo/latest/configuration/#server
 server:
   http_listen_port: 3200
   # 20 mb- above max_bytes_per_trace, as querying the trace data from frontend
@@ -8,12 +10,14 @@ server:
   grpc_server_max_recv_msg_size: 20_000_000
   grpc_server_max_send_msg_size: 50_000_000
 
+# https://grafana.com/docs/tempo/latest/configuration/#memberlist
 memberlist:
   abort_if_cluster_join_fails: false
   bind_port: 7946
   join_members:
     - tempo-gossip-ring:7946
 
+# https://grafana.com/docs/tempo/latest/configuration/#metrics-generator
 metrics_generator:
   storage:
     path: /var/tempo/wal
@@ -44,6 +48,7 @@ metrics_generator:
         - k8s.namespace.name
         - uw.team
 
+# https://grafana.com/docs/tempo/latest/configuration/#query-frontend
 query_frontend:
   max_batch_size: 8
   search:
@@ -52,6 +57,7 @@ query_frontend:
     concurrent_jobs: 10_000
     max_duration: 0
 
+# https://grafana.com/docs/tempo/latest/configuration/#querier
 querier:
   max_concurrent_queries: 500
   trace_by_id:
@@ -63,6 +69,7 @@ querier:
       max_recv_msg_size: 20_000_000
       max_send_msg_size: 50_000_000
 
+# https://grafana.com/docs/tempo/latest/configuration/#distributor
 distributor:
   receivers:
     kafka:
@@ -81,6 +88,7 @@ distributor:
           key_file: /kafka-client-certificate/tls.key
           reload_interval: 1h
 
+# https://grafana.com/docs/tempo/latest/configuration/#ingester
 ingester:
   max_block_duration: 5m
   # 100 MB for a block in ingester
@@ -89,6 +97,7 @@ ingester:
     ring:
       replication_factor: 3
 
+# https://grafana.com/docs/tempo/latest/configuration/#storage
 storage:
   trace:
     wal:
@@ -160,6 +169,7 @@ storage:
       endpoint: s3.eu-west-1.amazonaws.com
       hedge_requests_at: 500ms
 
+# https://grafana.com/docs/tempo/latest/configuration/#cache
 cache:
   background:
     writeback_goroutines: 5
@@ -175,6 +185,7 @@ cache:
       service: memcached-client
       timeout: 1000ms
 
+# https://grafana.com/docs/tempo/latest/configuration/#compactor
 compactor:
   compaction:
     # 30 days
@@ -187,6 +198,7 @@ compactor:
     kvstore:
       store: memberlist
 
+# https://grafana.com/docs/tempo/latest/configuration/#overrides
 overrides:
   defaults:
     global:

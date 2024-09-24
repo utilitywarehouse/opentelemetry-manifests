@@ -1,0 +1,87 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: &app otel-collector-web
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app otel-collector-web
+  annotations:
+    "app.uw.systems/description": "OpenTelemetry collector for client-side telemetry"
+    "app.uw.systems/tier": "tier_3"
+    "app.uw.systems/tags.oss": "true"
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  replicas: 2
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  template:
+    metadata:
+      name: *app
+      labels:
+        app: *app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8888"
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: *app
+          image: otel/opentelemetry-collector-contrib:0.107.0
+          args:
+            - "--config=/conf/otel-collector.yaml"
+          env:
+            - name: GOMEMLIMIT
+              value: "200MiB"
+          resources:
+            requests:
+              cpu: 0
+              memory: 200Mi
+            limits:
+              cpu: 1
+              memory: 300Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          ports:
+            - name: otlp-http-json
+              containerPort: 4318
+            - name: ext-zpages
+              containerPort: 55679
+            - name: collector-prom
+              containerPort: 8888
+            - name: prom
+              containerPort: 8889
+          volumeMounts:
+            - name: otel-collector-web-config-vol
+              mountPath: /conf
+      volumes:
+        - name: otel-collector-web-config-vol
+          configMap:
+            name: otel-collector-web
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - *app

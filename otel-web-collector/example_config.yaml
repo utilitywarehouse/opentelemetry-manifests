@@ -1,0 +1,36 @@
+# example config, not actually used
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: "0.0.0.0:7777"
+        cors:
+          allowed_origins:
+            - https://*.uw.co.uk
+          max_age: 7200
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+  zpages:
+    endpoint: "0.0.0.0:55679"
+
+exporters:
+  otlp:
+    # forward traces onto another collector
+    endpoint: "dns:///otel-collector:4317"
+    balancer_name: round_robin
+    sending_queue:
+      enabled: true
+      queue_size: 30000
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 1800s
+
+service:
+  extensions: [health_check, zpages]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [otlp]

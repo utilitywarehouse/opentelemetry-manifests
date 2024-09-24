@@ -14,7 +14,12 @@ flowchart LR
     Pod[
         **pod**
         Running our applications with OpenTelmetry instrumentation
-    ] -- "quickly offload traces" --> OTEL
+    ] -- "quickly offload traces" --> Collector
+    PubClients[
+        **Public Clients**
+        Public clients, like web or mobile applocations,
+        running our applications with OpenTelmetry instrumentation
+    ] --> CollectorWeb
 
     subgraph OTEL[OpenTelemetry stack]
     direction LR
@@ -22,9 +27,15 @@ flowchart LR
             **collector**
             additional handling like retries, batching
         ]
+        CollectorWeb["
+            **web collector (optional)**
+            second collector, meant specificially for traffic from public apps
+        "]
+        CollectorWeb-->Collector
     end OTEL
 
-    OTEL -- "via Collector's Exporter" --> Kafka -- "via Tempo's Distributor" --> Grafana
+    Collector -- "via Collector's Exporter" --> Kafka
+    Kafka -- "via Tempo's Distributor" --> Grafana
 
     subgraph Grafana[Grafana stack]
     Tempo["

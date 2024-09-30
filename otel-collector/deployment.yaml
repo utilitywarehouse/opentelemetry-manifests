@@ -39,11 +39,19 @@ spec:
           image: otel/opentelemetry-collector-contrib:0.107.0
           args:
             - "--config=/conf/otel-collector.yaml"
+          env:
+            - name: GOMAXPROCS
+              valueFrom:
+                resourceFieldRef:
+                  containerName: *app
+                  resource: limits.cpu
           resources:
             requests:
               cpu: 500m
               memory: 2Gi
             limits:
+              # Note: used by GOMAXPROCS in env, which will round up
+              # e.g. '1500m' -> '2'
               cpu: 1
               memory: 3Gi
           readinessProbe:

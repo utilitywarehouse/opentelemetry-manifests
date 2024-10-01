@@ -41,7 +41,10 @@ spec:
             - "--config=/conf/otel-collector.yaml"
           env:
             - name: GOMEMLIMIT
-              value: "200MiB"
+              valueFrom:
+                resourceFieldRef:
+                  containerName: *app
+                  resource: limits.memory
           resources:
             requests:
               cpu: 0

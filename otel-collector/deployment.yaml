@@ -45,6 +45,11 @@ spec:
                 resourceFieldRef:
                   containerName: *app
                   resource: limits.cpu
+            - name: GOMEMLIMIT
+              valueFrom:
+                resourceFieldRef:
+                  containerName: *app
+                  resource: limits.memory
           resources:
             requests:
               cpu: 500m

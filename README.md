@@ -65,7 +65,7 @@ flowchart LR
 
         PodAWS[Pod] ---> CollectorAWS
         CollectorAWS --> KafkaAWS
-        CollectorAWSWeb --> KafkaAWS
+        CollectorAWSWeb --> CollectorAWS
         KafkaAWS --> Tempo
     end aws
 

@@ -51,6 +51,8 @@ metrics_generator:
 # https://grafana.com/docs/tempo/latest/configuration/#query-frontend
 query_frontend:
   max_batch_size: 8
+  # Keep aligned with `search.concurrent_jobs` else search results will trigger 429 errors
+  max_outstanding_per_tenant: 10_000
   search:
     default_result_limit: 20
     max_result_limit: 500
